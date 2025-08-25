@@ -1,0 +1,38 @@
+version: '3.8'
+
+services:
+  web:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+      - SECRET_KEY=your-secret-key-here
+    depends_on:
+      - test-ftp-server
+    volumes:
+      - .:/app
+
+  test-ftp-server:
+    image: python:3.11-slim
+    command: >
+      sh -c "pip install --no-cache-dir pyftpdlib &&
+            python /app/ftp_server.py"
+    ports:
+      - "2122:2122"
+      - "2123-2129:2123-2129"
+    volumes:
+      - ./fake_mikrotik:/fake_mikrotik
+      - ./ftp_server.py:/app/ftp_server.py
+
+  tests:
+    build: .
+    command: >
+      sh -c "sleep 3 && python -m pytest tests/ -v -p no:cacheprovider"
+    environment:
+      - FLASK_ENV=testing
+    depends_on:
+      - web
+      - test-ftp-server
+    volumes:
+      - .:/app
