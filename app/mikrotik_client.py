@@ -1,5 +1,8 @@
 import ftplib
 from typing import Optional
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class MikroTikClient:
@@ -21,6 +24,9 @@ class MikroTikClient:
 
     def connect(self) -> bool:
         """Установка соединения"""
+        logger.debug(
+            f"Попытка подключения к {self.host}:{self.port}, timeout: {self.timeout}"
+        )
         try:
             self.ftp = ftplib.FTP()
             self.ftp.connect(self.host, self.port, self.timeout)
@@ -29,22 +35,24 @@ class MikroTikClient:
             return True
 
         except Exception as e:
-            print(f"Ошибка подключения к {self.host}:{self.port}, {e}")
+            logger.error(
+                f"Ошибка подключения к {self.host}:{self.port}: {str(e)}", exc_info=True
+            )
             self.connected = False
             return False
 
     def upload_file(self, local_path: str, remote_filename: str) -> bool:
         """Загрузка файла на устройство"""
         if not self.connected or not self.ftp:
-            print("Нет активного соединения")
+            logger.error("Нет активного соединения")
             return False
 
         try:
             with open(local_path, "rb") as file:
                 self.ftp.storbinary(f"STOR {remote_filename}", file)
-            print(f"Файл {remote_filename} успешно загружен на {self.host}")
+            logger.debug(f"Файл {remote_filename} успешно загружен на {self.host}")
             return True
 
         except Exception as e:
-            print(f"Ошибка загрузки файла на {self.host}: {e}")
+            logger.error(f"Ошибка загрузки файла на {self.host}: {e}")
             return False

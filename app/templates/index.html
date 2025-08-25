@@ -1,0 +1,38 @@
+<html>
+<head>
+    <title>MikroTik тестовое</title>
+</head>
+<body>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="messages">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+    
+    <form method="POST" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        
+        <div>
+            <label for="ip_address">IP адрес устройства:</label>
+            {{ form.ip_address() }}
+            {% if form.ip_address.errors %}
+                <div class="error">{{ form.ip_address.errors[0] }}</div>
+            {% endif %}
+        </div>
+        
+        <div>
+            <label for="firmware_file">Файл прошивки:</label>
+            {{ form.firmware_file() }}
+            {% if form.firmware_file.errors %}
+                <div class="error">{{ form.firmware_file.errors[0] }}</div>
+            {% endif %}
+        </div>
+        
+        <button type="submit">Загрузить</button>
+    </form>
+</body>
+</html>
