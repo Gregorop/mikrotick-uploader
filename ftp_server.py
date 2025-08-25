@@ -1,3 +1,5 @@
+"""ftp сервер для тестирования"""
+
 from pyftpdlib.authorizers import DummyAuthorizer
 from pyftpdlib.handlers import FTPHandler
 from pyftpdlib.servers import FTPServer
